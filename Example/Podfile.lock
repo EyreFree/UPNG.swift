@@ -1,0 +1,29 @@
+PODS:
+  - EFFoundation (1.5.4):
+    - EFFoundation/Core (= 1.5.4)
+  - EFFoundation/Core (1.5.4)
+  - SnapKit (5.6.0)
+  - UPNG.swift (0.1.0):
+    - EFFoundation (~> 1.5.4)
+
+DEPENDENCIES:
+  - SnapKit (= 5.6.0)
+  - UPNG.swift (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - EFFoundation
+    - SnapKit
+
+EXTERNAL SOURCES:
+  UPNG.swift:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  EFFoundation: c6c218497a550d0ef0b9332a9d17fafa86822a03
+  SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
+  UPNG.swift: e7ed2194483ea1ee9d3571cea11f9e9355e60033
+
+PODFILE CHECKSUM: 9ed70c157a2006ef0820f0425a4466b6b5c0937e
+
+COCOAPODS: 1.11.3

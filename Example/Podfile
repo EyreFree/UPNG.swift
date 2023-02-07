@@ -1,0 +1,9 @@
+use_frameworks!
+
+platform :ios, '11.0'
+
+target 'UPNG.swift_Example' do
+  pod 'SnapKit', '5.6.0'
+  pod 'UPNG.swift', :path => '../'
+
+end
