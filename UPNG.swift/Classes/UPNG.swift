@@ -124,7 +124,7 @@ public class UPNG {
     
     private func loadUPNGPage(webView: WKWebView, completion: ((Bool) -> Void)?) {
         printLog("loadUPNGPage")
-        if let url = Bundle(for: UPNG.self).url(forResource: "index", withExtension: "html", subdirectory: "upng.photopea.com") {
+        if let url = Bundle(for: UPNG.self).url(forResource: "index", withExtension: "html", subdirectory: "") {
             DispatchQueue.main.async { [weak self] in
                 guard let _ = self else { return }
                 
