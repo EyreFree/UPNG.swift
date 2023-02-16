@@ -19,7 +19,6 @@ Use UPNG.js in swift.
   s.requires_arc = true
   
   s.source_files = 'UPNG.swift/Classes/**/*'
-  s.resources = 'docs/**/*'
   
   s.frameworks = 'UIKit', 'WebKit'
   s.dependency 'EFFoundation', '~> 1.5.4'
