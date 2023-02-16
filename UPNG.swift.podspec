@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'UPNG.swift'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'Use UPNG.js in swift.'
 
   s.description      = <<-DESC

@@ -3,7 +3,7 @@ PODS:
     - EFFoundation/Core (= 1.5.4)
   - EFFoundation/Core (1.5.4)
   - SnapKit (5.6.0)
-  - UPNG.swift (0.1.0):
+  - UPNG.swift (0.1.1):
     - EFFoundation (~> 1.5.4)
 
 DEPENDENCIES:
@@ -22,7 +22,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   EFFoundation: c6c218497a550d0ef0b9332a9d17fafa86822a03
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
-  UPNG.swift: c1c7ffa78c6759fc6912497cf9148c04230f842c
+  UPNG.swift: 284921ca74b86a0b3ff92e676a5ee203c34b154b
 
 PODFILE CHECKSUM: 9ed70c157a2006ef0820f0425a4466b6b5c0937e
 
