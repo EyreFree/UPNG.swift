@@ -13,16 +13,19 @@ public class UPNG {
         
     }
     
-    private func getWebViewWith(tag: String, createIfNeeded: Bool) -> WKWebView? {
+    private func getWebViewWith(tag: String, createIfNeeded: Bool, completion: ((WKWebView?) -> Void)?) {
         if let webView = UPNG.dictionary[tag] {
-            return webView
+            completion?(webView)
         } else if createIfNeeded {
-            let tempView: WKWebView = WKWebView()
-            tempView.isHidden = false
-            setWebViewWith(tag: tag, webView: tempView)
-            return tempView
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                let tempView: WKWebView = WKWebView()
+                tempView.isHidden = false
+                self.setWebViewWith(tag: tag, webView: tempView)
+                completion?(tempView)
+            }
         }
-        return nil
     }
     
     private func removeWebViewWith(tag: String) {
@@ -46,78 +49,81 @@ public class UPNG {
     /// - Returns: Void..
     public func optimize(imageData: Data, compressionLevel: Int = 200, timeout: TimeInterval = 20, completion: ((Data?, Error?) -> Void)?) {
         let webViewTag: String = "\(Date().timeIntervalSince1970)"
-        guard let webView: WKWebView = getWebViewWith(tag: webViewTag, createIfNeeded: true) else {
-            completion?(nil, "Create webView failed")
-            return
-        }
-        
-        let timeoutDate: Date = Date().addingTimeInterval(timeout)
-        func customCompletion(_ imageData: Data?, _ error: Error?) {
-            removeWebViewWith(tag: webViewTag)
-            completion?(imageData, error)
-        }
-        self.loadUPNGPage(webView: webView) { [weak self] success in
+        getWebViewWith(tag: webViewTag, createIfNeeded: true) { [weak self] webView in
             guard let self = self else { return }
             
-            if success {
-                self.waitingPageLoading(webView: webView, timeoutDate: timeoutDate) { [weak self] result, error in
+            if let webView = webView {
+                let timeoutDate: Date = Date().addingTimeInterval(timeout)
+                func customCompletion(_ imageData: Data?, _ error: Error?) {
+                    self.removeWebViewWith(tag: webViewTag)
+                    completion?(imageData, error)
+                }
+                self.loadUPNGPage(webView: webView) { [weak self] success in
                     guard let self = self else { return }
                     
-                    if true == result {
-                        self.waitingSetCompressionLevel(webView: webView, value: compressionLevel) { [weak self] result, error in
+                    if success {
+                        self.waitingPageLoading(webView: webView, timeoutDate: timeoutDate) { [weak self] result, error in
                             guard let self = self else { return }
                             
                             if true == result {
-                                let imageBase64String: String = imageData.base64EncodedString()
-                                self.waitingSetImageBase64String(webView: webView, imageBase64String: imageBase64String) { [weak self] result, error in
+                                self.waitingSetCompressionLevel(webView: webView, value: compressionLevel) { [weak self] result, error in
                                     guard let self = self else { return }
                                     
                                     if true == result {
-                                        self.waitingInputButtonClicked(webView: webView) { [weak self] error in
+                                        let imageBase64String: String = imageData.base64EncodedString()
+                                        self.waitingSetImageBase64String(webView: webView, imageBase64String: imageBase64String) { [weak self] result, error in
                                             guard let self = self else { return }
                                             
-                                            if let error = error {
-                                                printLog("waitingInputButtonClicked: \(error.localizedDescription)")
-                                                customCompletion(nil, error)
-                                            } else {
-                                                self.waitingOutImageState(webView: webView, timeoutDate: timeoutDate) { [weak self] result, error in
+                                            if true == result {
+                                                self.waitingInputButtonClicked(webView: webView) { [weak self] error in
                                                     guard let self = self else { return }
                                                     
-                                                    if true == result {
-                                                        self.waitingGetOutImageBase64String(webView: webView, timeoutDate: timeoutDate) { [weak self] imageBase64String, error in
-                                                            guard let _ = self else { return }
+                                                    if let error = error {
+                                                        printLog("waitingInputButtonClicked: \(error.localizedDescription)")
+                                                        customCompletion(nil, error)
+                                                    } else {
+                                                        self.waitingOutImageState(webView: webView, timeoutDate: timeoutDate) { [weak self] result, error in
+                                                            guard let self = self else { return }
                                                             
-                                                            if let imageBase64String = imageBase64String, imageBase64String.isEmpty == false,
-                                                                let imageData = Data(base64Encoded: imageBase64String, options: .ignoreUnknownCharacters) {
-                                                                customCompletion(imageData, error)
+                                                            if true == result {
+                                                                self.waitingGetOutImageBase64String(webView: webView, timeoutDate: timeoutDate) { [weak self] imageBase64String, error in
+                                                                    guard let _ = self else { return }
+                                                                    
+                                                                    if let imageBase64String = imageBase64String, imageBase64String.isEmpty == false,
+                                                                        let imageData = Data(base64Encoded: imageBase64String, options: .ignoreUnknownCharacters) {
+                                                                        customCompletion(imageData, error)
+                                                                    } else {
+                                                                        customCompletion(nil, error)
+                                                                    }
+                                                                }
                                                             } else {
+                                                                printLog("waitingOptimizeState failed: \(error?.localizedDescription ?? "")")
                                                                 customCompletion(nil, error)
                                                             }
                                                         }
-                                                    } else {
-                                                        printLog("waitingOptimizeState failed: \(error?.localizedDescription ?? "")")
-                                                        customCompletion(nil, error)
                                                     }
                                                 }
+                                            } else {
+                                                printLog("waitingSetImageBase64String failed: \(error?.localizedDescription ?? "")")
+                                                customCompletion(nil, error)
                                             }
                                         }
                                     } else {
-                                        printLog("waitingSetImageBase64String failed: \(error?.localizedDescription ?? "")")
+                                        printLog("waitingSetCompressionLevel failed: \(error?.localizedDescription ?? "")")
                                         customCompletion(nil, error)
                                     }
                                 }
                             } else {
-                                printLog("waitingSetCompressionLevel failed: \(error?.localizedDescription ?? "")")
+                                printLog("waitingPageLoading failed: \(error?.localizedDescription ?? "")")
                                 customCompletion(nil, error)
                             }
                         }
                     } else {
-                        printLog("waitingPageLoading failed: \(error?.localizedDescription ?? "")")
-                        customCompletion(nil, error)
+                        customCompletion(nil, "loadUPNGPage failed")
                     }
                 }
             } else {
-                customCompletion(nil, "loadUPNGPage failed")
+                completion?(nil, "Create webView failed")
             }
         }
     }
@@ -152,7 +158,7 @@ public class UPNG {
                 } else if let result = data as? Bool, result == true {
                     completion?(true, nil)
                 } else {
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.05) { [weak self] in
+                    DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: DispatchTime.now() + 0.05) { [weak self] in
                         guard let self = self else { return }
                         
                         self.waitingPageLoading(webView: webView, timeoutDate: timeoutDate, completion: completion)
@@ -238,7 +244,7 @@ public class UPNG {
                 } else if let result = data as? Bool, result == true {
                     completion?(true, nil)
                 } else {
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.05) { [weak self] in
+                    DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: DispatchTime.now() + 0.05) { [weak self] in
                         guard let self = self else { return }
                         
                         self.waitingOutImageState(webView: webView, timeoutDate: timeoutDate, completion: completion)
@@ -267,7 +273,7 @@ public class UPNG {
                     let base64DataString: String = base64String.removePrefix(string: "data:application/octet-stream;base64,")
                     completion?(base64DataString, nil)
                 } else {
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.05) { [weak self] in
+                    DispatchQueue.global(qos: .userInteractive).asyncAfter(deadline: DispatchTime.now() + 0.05) { [weak self] in
                         guard let self = self else { return }
                         
                         self.waitingGetOutImageBase64String(webView: webView, timeoutDate: timeoutDate, completion: completion)
