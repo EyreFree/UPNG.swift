@@ -578,7 +578,7 @@ var UPNG = (function() {
 		var leng = 8 + (16+5+4) /*+ (9+4)*/ + (anim ? 20 : 0);
 		if(tabs["sRGB"]!=null) leng += 8+1+4;
 		if(tabs["pHYs"]!=null) leng += 8+9+4;
-		if(tabs["iCCP"]!=null) {  cicc = window.UZIP.deflate(tabs["iCCP"]);  leng += 8 + 11 + 2 + cicc.length + 4;  }
+		if(tabs["iCCP"]!=null) {  cicc = pako.deflate(tabs["iCCP"]);  leng += 8 + 11 + 2 + cicc.length + 4;  }
 		if(nimg.ctype==3) {
 			var dl = nimg.plte.length;
 			for(var i=0; i<dl; i++) if((nimg.plte[i]>>>24)!=255) pltAlpha = true;
@@ -918,7 +918,7 @@ var UPNG = (function() {
 		var opts;  if(levelZero) opts={level:0};
 		
 		
-		var CMPR = window.UZIP;
+		var CMPR = (data.length>10e6 && window.UZIP!=null) ? window.UZIP : pako;
 		
 		var time = Date.now();
 		for(var i=0; i<ftry.length; i++) {

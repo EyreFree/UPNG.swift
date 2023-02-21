@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'UPNG.swift'
-  s.version          = '0.1.1'
+  s.version          = '0.1.2'
   s.summary          = 'Use UPNG.js in swift.'
 
   s.description      = <<-DESC
@@ -19,6 +19,7 @@ Use UPNG.js in swift.
   s.requires_arc = true
   
   s.source_files = 'UPNG.swift/Classes/**/*'
+  s.resources = 'docs/**/*'
   
   s.frameworks = 'UIKit', 'WebKit'
   s.dependency 'EFFoundation', '~> 1.5.4'

@@ -221,7 +221,9 @@ class ViewController: UIViewController {
                     printLog(error?.localizedDescription ?? "Unknown")
                 }
                 
-                self.actionButton.isEnabled = true
+                DispatchQueue.main.async {
+                    self.actionButton.isEnabled = true
+                }
             }
         }
     }
